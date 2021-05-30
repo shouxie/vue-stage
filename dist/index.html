@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">{{message}}</div>
+  <script src="vue.js"></script>
+  <script>
+    /*
+    vue 默认支持响应式数据变化 （双向绑定）
+    双向绑定页面需要能够修改（表单等） 数据变化可以影响视图显示
+    响应式数据变化 能监控到数据变化 并且更新视图
+    vue 并不是mvvm， 只是做视图的（官网，用户界面）
+    渐进式： 后续加 组件化 vue-router vuex 
+    */
+    // console.log(Vue)
+
+    //
+    new Vue({
+      el: '#app',
+      data: {
+        message: 'mess',
+      }
+    })
+  </script>
+  
+</body>
+</html>

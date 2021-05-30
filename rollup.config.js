@@ -1,5 +1,5 @@
 import babel from 'rollup-plugin-babel'
-
+import resolve from 'rollup-plugin-node-resolve'
 export default {
   input: './src/index.js', // 打包入口
   output: {
@@ -10,6 +10,7 @@ export default {
     sourcemap: true,
   },
   plugins: [
+    resolve(),
     babel({
       exclude: 'node_modules/**', // glob 写法 
     })

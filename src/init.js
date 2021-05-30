@@ -1,5 +1,5 @@
 import { initState } from "./state"
-import { compileToFunction } from "./compiler"
+import { compileToFunction } from "./compiler/index.js"
 import { mountComponent } from "./lifecycle"
 
 export function initMixin(Vue) {
@@ -36,6 +36,7 @@ export function initMixin(Vue) {
     if (!opts.render) {
       // 模板编译
       let template = opts.template
+      debugger
       if (!template) {
         template = el.outerHTML
       }
@@ -47,7 +48,7 @@ export function initMixin(Vue) {
     }
 
     //  这里已经获取到了，一个render函数的了，这个函数它的返回值 _c('div',{id:'app'},_c('span',undefined,'hello'))
-    mountComponent(vm.$el, vm)
+    mountComponent(vm)
 
   }
 }
