@@ -390,9 +390,84 @@
     // 4.diff算法 
   }
 
-  function mountComponent(vm) {
-    vm._render(); // _c _v _s
+  function patch(el, vnode) {
+    // 根据虚拟节点创造了真实节点
+    // 删除老节点 根据vnode创建新节点 替换掉老节点
+    const elm = createElm(vnode);
+    debugger; // el.nextSibling 不存在就是null 如果为null insertBefore就是appendChild
 
+    const parentNode = el.parentNode;
+    parentNode.insertBefore(elm, el.nextSibling);
+    parentNode.removeChild(el);
+    return elm; // 返回最新节点
+  } // 面试： 虚拟节点 的实现 ，如何将虚拟节点渲染成真实节点
+
+  function createElm(vnode) {
+    let {
+      tag,
+      data,
+      children,
+      text,
+      vm
+    } = vnode; // 让虚拟节点 和真实节点做一个映射关系, 后续某个虚拟节点更新了，可以跟踪到真实节点并且更新真实节点
+
+    if (typeof tag === 'string') {
+      vnode.el = document.createElement(tag); // 如果有data属性 ，需要把data设置到元素上
+
+      updateProperties(vnode.el, data);
+      children.forEach(child => {
+        vnode.el.appendChild(createElm(child));
+      });
+    } else {
+      vnode.el = document.createTextNode(text);
+    }
+
+    return vnode.el;
+  }
+
+  function updateProperties(el, props = {}) {
+    // 后续写diff算法的时候再进行完善
+    // 这里没有考虑样式等
+    for (let key in props) {
+      el.setAttribute(key, props[key]);
+    }
+  }
+
+  class Watcher {
+    constructor(vm, fn, cb, options) {
+      // $watch 要将dep放到watcher中
+      this.vm = vm;
+      this.fn = fn;
+      this.cb = cb;
+      this.options = options;
+      this.getter = fn; // fn 就是页面渲染逻辑
+
+      this.get(); // 标示上了后就做一次初始化
+    }
+
+    get() {
+      this.getter(); // 页面渲染逻辑render update 
+    }
+
+  }
+
+  function mountComponent(vm) {
+    let updateComponent = () => {
+      vm._update(vm._render()); // _c _v _s
+
+    }; // 每个组件都有一个watcher 我们把这个watcher称为渲染watcher
+
+
+    new Watcher(vm, updateComponent, () => {
+      console.log('后续增添更新钩子函数 update');
+    }, true); // updateComponent()
+  }
+  function lifeCycleMixin(Vue) {
+    Vue.prototype._update = function (vnode) {
+      // 采用的是 先序深度遍历 创建节点（遇到节点就创造节点，递归创建）
+      const vm = this;
+      vm.$el = patch(vm.$el, vnode);
+    };
   }
 
   function initMixin(Vue) {
@@ -451,7 +526,7 @@
   }
   function createText(vm, text) {
     // 返回虚拟节点
-    return vnode(vm, undefined, undefined, undefined, undefined, undefined);
+    return vnode(vm, undefined, undefined, undefined, undefined, text);
   }
 
   function vnode(vm, tag, data, children, key, text) {
@@ -480,7 +555,7 @@
       console.log(text);
       console.log(arguments);
       const vm = this;
-      return createText(vm); // 描述虚拟节点是属于哪个实例的
+      return createText(vm, text); // 描述虚拟节点是属于哪个实例的
     };
 
     Vue.prototype._s = function (val) {
@@ -498,7 +573,7 @@
       } = vm.$options;
       debugger;
       let vnode = render.call(vm);
-      console.log(vnode);
+      return vnode;
     };
   }
 
@@ -509,6 +584,7 @@
 
   initMixin(Vue);
   renderMixin(Vue);
+  lifeCycleMixin(Vue);
   // 2.会将用户的选项放到 vm.$options上
   // 3.会对当前属性上搜素有没有data 数据   initState
   // 4.有data 判断data是不是一个函数 ，如果是函数取返回值 initData

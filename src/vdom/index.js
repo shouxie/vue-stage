@@ -3,7 +3,7 @@ export function createElement(vm, tag, data={},...children) { // 返回虚拟节
 }
 
 export function createText(vm, text) { // 返回虚拟节点
-  return vnode(vm, undefined, undefined, undefined, undefined, undefined, text)
+  return vnode(vm, undefined, undefined, undefined, undefined, text)
 }
 
 
